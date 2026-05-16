@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block title %}Secure Blog Analytics{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="topbar">
+            <a class="brand" href="{{ url_for('index') }}">
+                <span class="brand-mark">S</span>
+                <span>Secure Blog Analytics</span>
+            </a>
+            <nav class="topnav">
+                <a href="{{ url_for('index') }}">前台</a>
+                {% if current_blogger %}
+                <a href="{{ url_for('dashboard') }}">仪表盘</a>
+                <form action="{{ url_for('logout') }}" method="post" class="inline-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="ghost-button">退出</button>
+                </form>
+                <span class="chip">{{ current_blogger.display_name }} / {{ "高级博主" if current_blogger.role == "premium" else "普通博主" }}</span>
+                {% else %}
+                <a href="{{ url_for('login') }}">博主登录</a>
+                {% endif %}
+            </nav>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <section class="flash-stack">
+            {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </section>
+        {% endif %}
+        {% endwith %}
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/tracker.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

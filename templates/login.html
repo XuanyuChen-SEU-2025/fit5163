@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}博主登录 | Secure Blog Analytics{% endblock %}
+
+{% block content %}
+<section class="login-shell">
+    <div class="login-card">
+        <p class="eyebrow">权限分级演示入口</p>
+        <h1>登录博主管理仪表盘</h1>
+        <p class="muted">
+            普通博主只能看基础指标；高级博主可以访问完整用户行为路径图谱和时间序列数据。
+        </p>
+        <form method="post" class="login-form">
+            <label>
+                用户名
+                <input type="text" name="username" placeholder="lin 或 helen" required>
+            </label>
+            <label>
+                密码
+                <input type="password" name="password" placeholder="blog123" required>
+            </label>
+            <button class="primary-button" type="submit">登录</button>
+        </form>
+    </div>
+    <div class="demo-card">
+        <h2>演示账号</h2>
+        <div class="demo-row">
+            <span>普通博主</span>
+            <strong>lin / blog123</strong>
+        </div>
+        <div class="demo-row">
+            <span>高级博主</span>
+            <strong>helen / blog123</strong>
+        </div>
+        <p class="muted">两个账号都会进入同一套后台，但数据权限不同。</p>
+    </div>
+</section>
+{% endblock %}

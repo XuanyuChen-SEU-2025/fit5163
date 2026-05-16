@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} | Secure Blog Analytics{% endblock %}
+
+{% block content %}
+<section class="post-layout" data-post-root data-post-id="{{ post.id }}">
+    <article class="article-card">
+        <p class="eyebrow">{{ post.display_name }} / {{ "高级博主" if post.role == "premium" else "普通博主" }}</p>
+        <h1>{{ post.title }}</h1>
+        <p class="lead">{{ post.excerpt }}</p>
+        <div class="article-body">
+            <p>{{ post.content }}</p>
+            <p>
+                系统会把行为事件通过加密明细写入数据库，并在后台按博主角色暴露不同层级的分析能力。
+                当前页面的浏览与停留时间也会纳入统计。
+            </p>
+        </div>
+    </article>
+
+    <aside class="analytics-panel">
+        <div class="panel-card">
+            <p class="eyebrow">实时互动</p>
+            <div class="metric-grid">
+                <article class="metric-card">
+                    <span>浏览量</span>
+                    <strong data-metric="views">{{ post.metrics.views }}</strong>
+                </article>
+                <article class="metric-card">
+                    <span>点赞</span>
+                    <strong data-metric="likes">{{ post.metrics.likes }}</strong>
+                </article>
+                <article class="metric-card">
+                    <span>评论</span>
+                    <strong data-metric="comments">{{ post.metrics.comments }}</strong>
+                </article>
+                <article class="metric-card">
+                    <span>平均停留</span>
+                    <strong data-metric="avg_dwell">{{ post.metrics.avg_dwell }}s</strong>
+                </article>
+            </div>
+            <div class="action-row">
+                <button class="primary-button" type="button" data-action="like" data-post-id="{{ post.id }}">点赞</button>
+                <button class="secondary-button" type="button" data-action="share" data-post-id="{{ post.id }}">分享</button>
+            </div>
+        </div>
+
+        <div class="panel-card">
+            <p class="eyebrow">发表评论</p>
+            <form class="comment-form" data-comment-form data-post-id="{{ post.id }}">
+                <label>
+                    昵称
+                    <input type="text" name="author_alias" maxlength="20" placeholder="例如：小雨">
+                </label>
+                <label>
+                    评论内容
+                    <textarea name="content" rows="4" maxlength="240" placeholder="分享一下你的想法..." required></textarea>
+                </label>
+                <button class="primary-button" type="submit">提交评论</button>
+            </form>
+        </div>
+    </aside>
+</section>
+
+<section class="section-head">
+    <div>
+        <p class="eyebrow">最新评论</p>
+        <h2>加密存储后按需解密展示</h2>
+    </div>
+    <p class="muted">评论原文不会以明文方式直接落库。</p>
+</section>
+
+<section class="comment-list" data-comment-list>
+    {% for comment in post.comments %}
+    <article class="comment-card">
+        <div class="comment-meta">
+            <strong>{{ comment.author_alias }}</strong>
+            <span>{{ comment.created_at }}</span>
+        </div>
+        <p>{{ comment.content }}</p>
+    </article>
+    {% else %}
+    <article class="comment-card empty">
+        <p>还没有评论，来留下第一条互动吧。</p>
+    </article>
+    {% endfor %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.BlogTracker.initPostPage({
+        postId: {{ post.id }},
+        csrfToken: "{{ csrf_token }}",
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}博主管理仪表盘 | Secure Blog Analytics{% endblock %}
+
+{% block content %}
+<section class="dashboard-hero">
+    <div>
+        <p class="eyebrow">分层分析仪表盘</p>
+        <h1>{{ blogger.display_name }} 的内容分析中心</h1>
+        <p class="hero-text">
+            当前角色：
+            <span class="chip">{{ "高级博主" if blogger.role == "premium" else "普通博主" }}</span>
+        </p>
+    </div>
+    <div class="hero-panel slim">
+        <strong>安全策略</strong>
+        <p>HTTPS/TLS 传输、敏感明细加密存储、CSRF 防护、Secure Cookie。</p>
+    </div>
+</section>
+
+<section class="metric-grid">
+    <article class="metric-card">
+        <span>总浏览量</span>
+        <strong>{{ dashboard.metrics.views }}</strong>
+    </article>
+    <article class="metric-card">
+        <span>点赞数</span>
+        <strong>{{ dashboard.metrics.likes }}</strong>
+    </article>
+    <article class="metric-card">
+        <span>评论数</span>
+        <strong>{{ dashboard.metrics.comments }}</strong>
+    </article>
+    <article class="metric-card">
+        <span>平均停留时长</span>
+        <strong>{{ dashboard.metrics.avg_dwell }}s</strong>
+    </article>
+</section>
+
+<section class="dashboard-grid">
+    <article class="panel-card">
+        <div class="section-head tight">
+            <div>
+                <p class="eyebrow">基础权限</p>
+                <h2>用户画像</h2>
+            </div>
+        </div>
+        <div class="persona-list">
+            {% for persona in dashboard.personas %}
+            <div class="persona-item">
+                <div class="persona-text">
+                    <strong>{{ persona.label }}</strong>
+                    <span>{{ persona.count }} 次访问</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: {{ persona.ratio }}%"></div>
+                </div>
+            </div>
+            {% else %}
+            <p class="muted">当前还没有可展示的访客画像。</p>
+            {% endfor %}
+        </div>
+    </article>
+
+    <article class="panel-card">
+        <div class="section-head tight">
+            <div>
+                <p class="eyebrow">基础权限</p>
+                <h2>文章表现</h2>
+            </div>
+        </div>
+        <div class="table-like">
+            {% for post in dashboard.top_posts %}
+            <div class="table-row">
+                <strong>{{ post.title }}</strong>
+                <span>{{ post.views }} 浏览 / {{ post.likes }} 赞 / {{ post.comments }} 评 / {{ post.shares }} 分享</span>
+            </div>
+            {% else %}
+            <p class="muted">还没有文章数据。</p>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+
+{% if blogger.role == "premium" and dashboard.premium %}
+<section class="section-head">
+    <div>
+        <p class="eyebrow">高级权限</p>
+        <h2>时间序列统计</h2>
+    </div>
+    <p class="muted">最近 7 天的浏览趋势，适合观察内容发布后的持续热度。</p>
+</section>
+
+<section class="timeline-chart panel-card">
+    {% for point in dashboard.premium.series %}
+    <div class="timeline-column">
+        <div class="timeline-bar" style="height: {{ point.view_ratio }}%"></div>
+        <strong>{{ point.views }}</strong>
+        <span>{{ point.day[5:] }}</span>
+    </div>
+    {% endfor %}
+</section>
+
+<section class="dashboard-grid">
+    <article class="panel-card">
+        <div class="section-head tight">
+            <div>
+                <p class="eyebrow">高级权限</p>
+                <h2>用户行为路径图谱</h2>
+            </div>
+        </div>
+        <div class="journey-list">
+            {% for path in dashboard.premium.journeys %}
+            <div class="journey-item">
+                <div class="journey-flow">
+                    <span>{{ path.from }}</span>
+                    <span class="arrow">→</span>
+                    <span>{{ path.to }}</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill accent" style="width: {{ path.ratio }}%"></div>
+                </div>
+                <small>{{ path.count }} 次触发</small>
+            </div>
+            {% else %}
+            <p class="muted">暂无足够的路径数据。</p>
+            {% endfor %}
+        </div>
+    </article>
+
+    <article class="panel-card">
+        <div class="section-head tight">
+            <div>
+                <p class="eyebrow">高级权限</p>
+                <h2>近期会话快照</h2>
+            </div>
+        </div>
+        <div class="table-like">
+            {% for snapshot in dashboard.premium.snapshots %}
+            <div class="table-row">
+                <strong>#{{ snapshot.token }}</strong>
+                <span>{{ snapshot.persona }} / {{ snapshot.device }} / {{ snapshot.region }} / {{ snapshot.touchpoints }} 次触点</span>
+            </div>
+            {% else %}
+            <p class="muted">暂无近期会话。</p>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% else %}
+<section class="panel-card lock-panel">
+    <p class="eyebrow">权限隔离</p>
+    <h2>高级分析已保护</h2>
+    <p>
+        当前账号为普通博主，仅可查看总浏览量、点赞数、评论数与基础用户画像。
+        用户行为路径图谱和时间序列统计仅对高级博主开放。
+    </p>
+</section>
+{% endif %}
+{% endblock %}
