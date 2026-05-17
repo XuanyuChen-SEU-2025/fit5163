@@ -37,12 +37,31 @@
     </article>
 </section>
 
+<section class="metric-grid">
+    <article class="metric-card">
+        <span>总访客数</span>
+        <strong>{{ dashboard.visitor_summary.total_visitors }}</strong>
+    </article>
+    <article class="metric-card">
+        <span>匿名访客统计</span>
+        <strong>{{ dashboard.visitor_summary.anonymous_sessions }}</strong>
+    </article>
+    <article class="metric-card">
+        <span>已登录访客</span>
+        <strong>{{ dashboard.visitor_summary.logged_in_visitors }}</strong>
+    </article>
+    <article class="metric-card">
+        <span>已登录访客活动</span>
+        <strong>{{ dashboard.visitor_summary.logged_in_activity }}</strong>
+    </article>
+</section>
+
 <section class="dashboard-grid">
     <article class="panel-card">
         <div class="section-head tight">
             <div>
-                <p class="eyebrow">基础权限</p>
-                <h2>用户画像</h2>
+                <p class="eyebrow">基础权限 / 匿名访客统计</p>
+                <h2>匿名访客分布</h2>
             </div>
         </div>
         <div class="persona-list">
@@ -50,7 +69,7 @@
             <div class="persona-item">
                 <div class="persona-text">
                     <strong>{{ persona.label }}</strong>
-                    <span>{{ persona.count }} 次访问</span>
+                    <span>{{ persona.count }} 次匿名访问</span>
                 </div>
                 <div class="bar-track">
                     <div class="bar-fill" style="width: {{ persona.ratio }}%"></div>
@@ -58,6 +77,25 @@
             </div>
             {% else %}
             <p class="muted">当前还没有可展示的访客画像。</p>
+            {% endfor %}
+        </div>
+    </article>
+
+    <article class="panel-card">
+        <div class="section-head tight">
+            <div>
+                <p class="eyebrow">基础权限</p>
+                <h2>访客身份分布</h2>
+            </div>
+        </div>
+        <div class="table-like">
+            {% for item in dashboard.visitor_types %}
+            <div class="table-row">
+                <strong>{{ item.label }}</strong>
+                <span>{{ item.activity_count }} 次活动 / {{ item.session_count }} 个 session / {{ item.account_count }} 个账号</span>
+            </div>
+            {% else %}
+            <p class="muted">暂时没有访客行为数据。</p>
             {% endfor %}
         </div>
     </article>
@@ -106,11 +144,11 @@
         <div class="section-head tight">
             <div>
                 <p class="eyebrow">高级权限</p>
-                <h2>用户行为路径图谱</h2>
+                <h2>匿名访问路径</h2>
             </div>
         </div>
         <div class="journey-list">
-            {% for path in dashboard.premium.journeys %}
+            {% for path in dashboard.premium.anonymous_journeys %}
             <div class="journey-item">
                 <div class="journey-flow">
                     <span>{{ path.from }}</span>
@@ -123,7 +161,33 @@
                 <small>{{ path.count }} 次触发</small>
             </div>
             {% else %}
-            <p class="muted">暂无足够的路径数据。</p>
+            <p class="muted">暂无足够的匿名访问路径数据。</p>
+            {% endfor %}
+        </div>
+    </article>
+
+    <article class="panel-card">
+        <div class="section-head tight">
+            <div>
+                <p class="eyebrow">高级权限</p>
+                <h2>已登录访客路径</h2>
+            </div>
+        </div>
+        <div class="journey-list">
+            {% for path in dashboard.premium.authenticated_journeys %}
+            <div class="journey-item">
+                <div class="journey-flow">
+                    <span>{{ path.from }}</span>
+                    <span class="arrow">→</span>
+                    <span>{{ path.to }}</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill accent" style="width: {{ path.ratio }}%"></div>
+                </div>
+                <small>{{ path.count }} 次触发</small>
+            </div>
+            {% else %}
+            <p class="muted">暂无足够的已登录访客路径数据。</p>
             {% endfor %}
         </div>
     </article>
@@ -139,7 +203,7 @@
             {% for snapshot in dashboard.premium.snapshots %}
             <div class="table-row">
                 <strong>#{{ snapshot.token }}</strong>
-                <span>{{ snapshot.persona }} / {{ snapshot.device }} / {{ snapshot.region }} / {{ snapshot.touchpoints }} 次触点</span>
+                <span>{{ snapshot.visitor_label }} / {{ snapshot.persona }} / {{ snapshot.device }} / {{ snapshot.region }} / {{ snapshot.touchpoints }} 次触点</span>
             </div>
             {% else %}
             <p class="muted">暂无近期会话。</p>

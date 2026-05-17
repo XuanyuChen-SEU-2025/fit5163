@@ -4,10 +4,19 @@
         startTime: null,
         postId: null,
         dwellSent: false,
+        initialized: false,
 
-        initPostPage(options) {
-            this.csrfToken = options.csrfToken;
-            this.postId = options.postId;
+        initPostPage(options = {}) {
+            const root = document.querySelector("[data-post-root]");
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+
+            this.csrfToken = options.csrfToken || (csrfMeta ? csrfMeta.content : "");
+            this.postId = Number(options.postId || (root ? root.dataset.postId : 0));
+            if (!this.csrfToken || !this.postId || this.initialized) {
+                return;
+            }
+
+            this.initialized = true;
             this.startTime = Date.now();
             this.bindActionButtons();
             this.bindCommentForm();
@@ -24,16 +33,22 @@
                 button.addEventListener("click", async () => {
                     const action = button.dataset.action;
                     const url = `/api/posts/${button.dataset.postId}/${action}`;
-                    const response = await fetch(url, {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-Token": this.csrfToken,
-                            "X-Share-Channel": action === "share" ? "页面按钮" : "",
-                        },
-                    });
-                    const payload = await response.json();
-                    if (payload.ok) {
+                    const headers = { "X-CSRF-Token": this.csrfToken };
+
+                    if (action === "share") {
+                        headers["X-Share-Channel"] = "page-button";
+                    }
+
+                    try {
+                        const response = await fetch(url, { method: "POST", headers });
+                        const payload = await response.json();
+                        if (!response.ok || !payload.ok) {
+                            window.alert(payload.error || "Action failed. Please try again.");
+                            return;
+                        }
                         this.refreshMetrics(payload.metrics);
+                    } catch (_error) {
+                        window.alert("Action failed. Please try again.");
                     }
                 });
             });
@@ -44,22 +59,29 @@
             if (!form) {
                 return;
             }
+
             form.addEventListener("submit", async (event) => {
                 event.preventDefault();
                 const formData = new FormData(form);
-                const response = await fetch(`/api/posts/${form.dataset.postId}/comment`, {
-                    method: "POST",
-                    headers: {
-                        "X-CSRF-Token": this.csrfToken,
-                    },
-                    body: formData,
-                });
-                const payload = await response.json();
-                if (payload.ok) {
-                    this.refreshMetrics(payload.metrics);
-                    window.location.reload();
-                } else if (payload.error) {
-                    window.alert(payload.error);
+                formData.set("csrf_token", this.csrfToken);
+
+                try {
+                    const response = await fetch(`/api/posts/${form.dataset.postId}/comment`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-Token": this.csrfToken,
+                        },
+                        body: formData,
+                    });
+                    const payload = await response.json();
+                    if (payload.ok) {
+                        this.refreshMetrics(payload.metrics);
+                        window.location.reload();
+                    } else {
+                        window.alert(payload.error || "Comment failed. Please try again.");
+                    }
+                } catch (_error) {
+                    window.alert("Comment failed. Please try again.");
                 }
             });
         },
@@ -68,18 +90,26 @@
             if (this.dwellSent || !this.postId || !this.startTime) {
                 return;
             }
+
             this.dwellSent = true;
             const seconds = Math.max(1, Math.round((Date.now() - this.startTime) / 1000));
             const formData = new FormData();
             formData.append("post_id", this.postId);
             formData.append("seconds", seconds);
             formData.append("csrf_token", this.csrfToken);
+
             if (navigator.sendBeacon) {
-                navigator.sendBeacon("/api/track/dwell", formData);
-                return;
+                const accepted = navigator.sendBeacon("/api/track/dwell", formData);
+                if (accepted) {
+                    return;
+                }
             }
+
             fetch("/api/track/dwell", {
                 method: "POST",
+                headers: {
+                    "X-CSRF-Token": this.csrfToken,
+                },
                 body: formData,
                 keepalive: true,
             });
@@ -94,7 +124,23 @@
                 node.textContent = key === "avg_dwell" ? `${value}s` : value;
             });
         },
+
+        autoInit() {
+            const root = document.querySelector("[data-post-root]");
+            if (!root) {
+                return;
+            }
+            this.initPostPage({
+                postId: root.dataset.postId,
+            });
+        },
     };
 
     window.BlogTracker = BlogTracker;
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => BlogTracker.autoInit());
+    } else {
+        BlogTracker.autoInit();
+    }
 })();

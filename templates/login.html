@@ -8,6 +8,7 @@
         <p class="eyebrow">权限分级演示入口</p>
         <h1>登录博主管理仪表盘</h1>
         <p class="muted">
+            Blogger accounts are separate and are used only for dashboard analytics access.
             普通博主只能看基础指标；高级博主可以访问完整用户行为路径图谱和时间序列数据。
         </p>
         <form method="post" class="login-form">
@@ -21,6 +22,7 @@
             </label>
             <button class="primary-button" type="submit">登录</button>
         </form>
+        <p class="muted">前台 visitor 登录请使用 <a class="inline-link" href="{{ url_for('visitor_login') }}">访客登录</a>。</p>
     </div>
     <div class="demo-card">
         <h2>演示账号</h2>

@@ -16,6 +16,16 @@
             </a>
             <nav class="topnav">
                 <a href="{{ url_for('index') }}">前台</a>
+                {% if current_visitor %}
+                <span class="chip">当前访客：{{ current_visitor.display_name }}</span>
+                <form action="{{ url_for('visitor_logout') }}" method="post" class="inline-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit" class="ghost-button">退出访客</button>
+                </form>
+                {% else %}
+                <a href="{{ url_for('visitor_login') }}">访客登录</a>
+                <span class="chip">匿名访客</span>
+                {% endif %}
                 {% if current_blogger %}
                 <a href="{{ url_for('dashboard') }}">仪表盘</a>
                 <form action="{{ url_for('logout') }}" method="post" class="inline-form">

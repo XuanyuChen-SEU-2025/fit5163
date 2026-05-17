@@ -76,6 +76,7 @@ def create_app(test_config: dict | None = None) -> Flask:
         return {
             "csrf_token": get_csrf_token(),
             "current_blogger": session.get("blogger"),
+            "current_visitor": session.get("visitor"),
         }
 
     @app.after_request
@@ -117,6 +118,32 @@ def create_app(test_config: dict | None = None) -> Flask:
                 flash(f"欢迎回来，{blogger['display_name']}。", "success")
                 return redirect(url_for("dashboard"))
         return render_template("login.html")
+
+    @app.route("/visitor/login", methods=["GET", "POST"])
+    def visitor_login():
+        if request.method == "POST":
+            token = request.headers.get("X-CSRF-Token") or request.form.get("csrf_token")
+            if not validate_csrf_token(token):
+                abort(400, "无效的 CSRF token")
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "").strip()
+            visitor = service.authenticate_visitor(username, password)
+            if not visitor:
+                flash("访客用户名或密码错误，请使用演示访客账号登录。", "error")
+            else:
+                session["visitor"] = visitor
+                session.pop("visitor_token", None)
+                flash(f"已登录访客：{visitor['display_name']}。", "success")
+                return redirect(url_for("index"))
+        return render_template("visitor_login.html")
+
+    @app.post("/visitor/logout")
+    @csrf_protected
+    def visitor_logout():
+        session.pop("visitor", None)
+        session.pop("visitor_token", None)
+        flash("已退出访客账号，之后的前台行为会记录为匿名访客。", "success")
+        return redirect(url_for("index"))
 
     @app.post("/logout")
     @csrf_protected

@@ -9,10 +9,17 @@
         <h1>面向博主的多层级博客活动分析系统</h1>
         <p class="hero-text">
             这个演示站点会安全记录页面浏览、停留时长、点赞、评论和分享行为，
-            并根据博主角色在后台展示不同层级的数据权限。
+            匿名访客会生成 anonymous activity data；已登录访客会生成 linked visitor account activity。
+            Blogger accounts 独立用于后台 analytics access。
         </p>
         <div class="hero-actions">
             <a class="primary-button" href="{{ url_for('login') }}">查看博主仪表盘</a>
+            {% if current_visitor %}
+            <span class="chip">已登录访客：{{ current_visitor.display_name }}</span>
+            {% else %}
+            <a class="secondary-button" href="{{ url_for('visitor_login') }}">访客登录</a>
+            <span class="chip">当前：匿名访客</span>
+            {% endif %}
             <span class="chip">开发模式默认以 HTTPS/TLS 启动</span>
         </div>
     </div>
