@@ -675,7 +675,6 @@ class BlogAnalyticsService:
             JOIN visitor_sessions s ON s.session_token = a.session_token
             WHERE a.blogger_id = ?
               AND a.event_type = 'page_view'
-              AND COALESCE(a.visitor_type, s.visitor_type, 'anonymous') = 'anonymous'
             GROUP BY s.persona_segment
             ORDER BY count DESC
             """,

@@ -228,6 +228,8 @@ def test_public_pages_do_not_expose_dashboard_only_analytics():
 def test_basic_and_premium_dashboards_render_visitor_type_pie():
     app = build_app()
     client = app.test_client()
+    legacy_anonymous_distribution = "匿名访客" + "分布"
+    legacy_anonymous_stats = "匿名访客" + "统计"
 
     basic_response = client.post(
         "/login",
@@ -236,6 +238,9 @@ def test_basic_and_premium_dashboards_render_visitor_type_pie():
     )
     basic_html = basic_response.get_data(as_text=True)
     assert basic_response.status_code == 200
+    assert "访客用户画像" in basic_html
+    assert legacy_anonymous_distribution not in basic_html
+    assert legacy_anonymous_stats not in basic_html
     assert "访客类型占比" in basic_html
     assert "匿名访客" in basic_html
     assert "已登录访客" in basic_html
@@ -251,6 +256,9 @@ def test_basic_and_premium_dashboards_render_visitor_type_pie():
     )
     premium_html = premium_response.get_data(as_text=True)
     assert premium_response.status_code == 200
+    assert "访客用户画像" in premium_html
+    assert legacy_anonymous_distribution not in premium_html
+    assert legacy_anonymous_stats not in premium_html
     assert "访客类型占比" in premium_html
     assert "匿名访客" in premium_html
     assert "已登录访客" in premium_html
@@ -440,6 +448,52 @@ def test_dashboard_login_role_levels_are_server_side():
             "authenticated_journeys",
             "snapshots",
         }.issubset(premium_dashboard["premium"])
+
+
+def test_dashboard_persona_distribution_includes_authenticated_page_views():
+    app = build_app()
+    anonymous_client = app.test_client()
+    visitor_client = app.test_client()
+
+    anonymous_response = anonymous_client.get("/post/secure-content-growth")
+    assert anonymous_response.status_code == 200
+
+    visitor_response = login_visitor(visitor_client)
+    assert visitor_response.status_code == 200
+    authenticated_response = visitor_client.get("/post/secure-content-growth")
+    assert authenticated_response.status_code == 200
+
+    with app.app_context():
+        service = app.extensions["analytics_service"]
+        lin = service.authenticate("lin", "blog123")
+        dashboard = service.build_dashboard(lin["id"], lin["role"])
+        persona_count = sum(item["count"] for item in dashboard["personas"])
+
+        db = get_db()
+        all_page_views = db.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM activity_logs a
+            JOIN visitor_sessions s ON s.session_token = a.session_token
+            WHERE a.blogger_id = ?
+              AND a.event_type = 'page_view'
+            """,
+            (lin["id"],),
+        ).fetchone()["count"]
+        anonymous_page_views = db.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM activity_logs a
+            JOIN visitor_sessions s ON s.session_token = a.session_token
+            WHERE a.blogger_id = ?
+              AND a.event_type = 'page_view'
+              AND COALESCE(a.visitor_type, s.visitor_type, 'anonymous') = 'anonymous'
+            """,
+            (lin["id"],),
+        ).fetchone()["count"]
+
+        assert all_page_views > anonymous_page_views
+        assert persona_count == all_page_views
 
 
 def test_passwords_and_visitor_profiles_remain_protected():

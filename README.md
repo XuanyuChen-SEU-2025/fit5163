@@ -55,7 +55,7 @@ conda run -p D:\anaconda3\envs\secure-blog-analytics python app.py
 
 - 未登录访客会记录为 `anonymous visitor session`，可以继续浏览文章、点赞、分享、评论和产生停留时间。
 - 已登录访客会记录为 `authenticated visitor`，行为会绑定到 visitor account。
-- Basic Blogger 可以看到总访客数、匿名访客统计、已登录访客活动数量和基础文章表现。
+- Basic Blogger 可以看到总访客数、访客分类分布、已登录访客活动数量和基础文章表现。
 - Premium Blogger 可以看到更详细的匿名访问路径、已登录访客路径、time series 和 session snapshots。
 
 ## 安全说明
