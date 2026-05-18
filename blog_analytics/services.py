@@ -744,6 +744,15 @@ class BlogAnalyticsService:
         persona_total = sum(row["count"] for row in persona_rows) or 1
         anonymous_sessions = visitor_summary_row["anonymous_sessions"] or 0
         logged_in_visitors = visitor_summary_row["logged_in_visitors"] or 0
+        visitor_type_total = anonymous_sessions + logged_in_visitors
+        if visitor_type_total:
+            anonymous_ratio = round(anonymous_sessions / visitor_type_total * 100, 1)
+            authenticated_ratio = round(logged_in_visitors / visitor_type_total * 100, 1)
+            anonymous_degrees = round(anonymous_sessions / visitor_type_total * 360, 1)
+        else:
+            anonymous_ratio = 0
+            authenticated_ratio = 0
+            anonymous_degrees = 0
         dashboard = {
             "metrics": {
                 "views": metrics_row["views"] or 0,
@@ -758,6 +767,14 @@ class BlogAnalyticsService:
                 "logged_in_visitors": logged_in_visitors,
                 "anonymous_activity": visitor_summary_row["anonymous_activity"] or 0,
                 "logged_in_activity": visitor_summary_row["logged_in_activity"] or 0,
+            },
+            "visitor_type_breakdown": {
+                "anonymous_count": anonymous_sessions,
+                "authenticated_count": logged_in_visitors,
+                "total_count": visitor_type_total,
+                "anonymous_ratio": anonymous_ratio,
+                "authenticated_ratio": authenticated_ratio,
+                "anonymous_degrees": anonymous_degrees,
             },
             "visitor_types": [
                 {
@@ -885,8 +902,6 @@ class BlogAnalyticsService:
             SELECT
                 s.session_token,
                 s.visitor_type,
-                v.display_name AS visitor_display_name,
-                v.username AS visitor_username,
                 s.persona_segment,
                 s.device_type,
                 s.region,
@@ -894,13 +909,10 @@ class BlogAnalyticsService:
                 COUNT(*) AS touchpoints
             FROM activity_logs a
             JOIN visitor_sessions s ON s.session_token = a.session_token
-            LEFT JOIN visitors v ON v.id = s.visitor_id
             WHERE a.blogger_id = ?
             GROUP BY
                 s.session_token,
                 s.visitor_type,
-                v.display_name,
-                v.username,
                 s.persona_segment,
                 s.device_type,
                 s.region
@@ -909,23 +921,25 @@ class BlogAnalyticsService:
             """,
             (blogger_id,),
         ).fetchall()
-        return [
-            {
-                "token": row["session_token"][-8:],
-                "visitor_type": row["visitor_type"],
-                "visitor_label": (
-                    row["visitor_display_name"] or row["visitor_username"]
-                    if row["visitor_type"] == "authenticated"
-                    else "匿名访客"
-                ),
-                "persona": row["persona_segment"],
-                "device": row["device_type"],
-                "region": row["region"],
-                "last_touch": row["last_touch"],
-                "touchpoints": row["touchpoints"],
-            }
-            for row in rows
-        ]
+        snapshots = []
+        for index, row in enumerate(rows, start=1):
+            snapshots.append(
+                {
+                    "display_label": f"会话 {index:02d}",
+                    "visitor_type": row["visitor_type"],
+                    "visitor_label": (
+                        "已登录访客"
+                        if row["visitor_type"] == "authenticated"
+                        else "匿名访客"
+                    ),
+                    "persona_label": row["persona_segment"],
+                    "device_label": row["device_type"],
+                    "region_label": row["region"],
+                    "last_touch": row["last_touch"],
+                    "touch_count": row["touchpoints"],
+                }
+            )
+        return snapshots
 
     def _visitor_account_from_session(self) -> dict | None:
         visitor = session.get("visitor")

@@ -185,6 +185,10 @@ def test_public_pages_do_not_expose_dashboard_only_analytics():
     app = build_app()
     client = app.test_client()
 
+    dashboard_response = client.get("/dashboard")
+    assert dashboard_response.status_code == 302
+    assert "/login" in dashboard_response.headers["Location"]
+
     index_response = client.get("/")
     index_html = index_response.get_data(as_text=True)
     assert index_response.status_code == 200
@@ -193,6 +197,9 @@ def test_public_pages_do_not_expose_dashboard_only_analytics():
     assert "journey-list" not in index_html
     assert "timeline-chart" not in index_html
     assert "session snapshots" not in index_html.lower()
+    assert "近期会话快照" not in index_html
+    assert "访客类型占比" not in index_html
+    assert "data-visitor-type-chart" not in index_html
 
     post_response = client.get("/post/secure-content-growth")
     post_html = post_response.get_data(as_text=True)
@@ -206,6 +213,70 @@ def test_public_pages_do_not_expose_dashboard_only_analytics():
     assert "persona_segment" not in post_html
     assert "journey-list" not in post_html
     assert "timeline-chart" not in post_html
+    assert "近期会话快照" not in post_html
+    assert "访客类型占比" not in post_html
+    assert "data-visitor-type-chart" not in post_html
+
+    visitor_client = app.test_client()
+    visitor_response = login_visitor(visitor_client)
+    visitor_html = visitor_response.get_data(as_text=True)
+    assert visitor_response.status_code == 200
+    assert "近期会话快照" not in visitor_html
+    assert "会话 01" not in visitor_html
+
+
+def test_basic_and_premium_dashboards_render_visitor_type_pie():
+    app = build_app()
+    client = app.test_client()
+
+    basic_response = client.post(
+        "/login",
+        data={"username": "lin", "password": "blog123"},
+        follow_redirects=True,
+    )
+    basic_html = basic_response.get_data(as_text=True)
+    assert basic_response.status_code == 200
+    assert "访客类型占比" in basic_html
+    assert "匿名访客" in basic_html
+    assert "已登录访客" in basic_html
+    assert "data-visitor-type-chart" in basic_html
+    assert "近期会话快照" not in basic_html
+    assert "会话 01" not in basic_html
+
+    client = app.test_client()
+    premium_response = client.post(
+        "/login",
+        data={"username": "helen", "password": "blog123"},
+        follow_redirects=True,
+    )
+    premium_html = premium_response.get_data(as_text=True)
+    assert premium_response.status_code == 200
+    assert "访客类型占比" in premium_html
+    assert "匿名访客" in premium_html
+    assert "已登录访客" in premium_html
+    assert "data-visitor-type-chart" in premium_html
+    assert "近期会话快照" in premium_html
+    assert "会话 01" in premium_html
+    assert "访客分类" in premium_html
+    assert "访问设备" in premium_html
+    assert "访问地区" in premium_html
+    assert "触点次数" in premium_html
+
+    with app.app_context():
+        db = get_db()
+        helen = db.execute("SELECT id FROM bloggers WHERE username = 'helen'").fetchone()
+        raw_tokens = db.execute(
+            """
+            SELECT DISTINCT session_token
+            FROM activity_logs
+            WHERE blogger_id = ?
+            LIMIT 6
+            """,
+            (helen["id"],),
+        ).fetchall()
+    for row in raw_tokens:
+        assert row["session_token"] not in premium_html
+        assert f"#{row['session_token'][-8:]}" not in premium_html
 
 
 def test_like_share_comment_and_dwell_posts_succeed_with_csrf():
@@ -343,7 +414,25 @@ def test_dashboard_login_role_levels_are_server_side():
         assert "avg_dwell" in premium_dashboard["metrics"]
         assert standard_dashboard["visitor_summary"]["anonymous_sessions"] >= 0
         assert standard_dashboard["visitor_summary"]["logged_in_activity"] >= 0
+        for payload in (standard_dashboard, premium_dashboard):
+            breakdown = payload["visitor_type_breakdown"]
+            assert breakdown["anonymous_count"] == payload["visitor_summary"]["anonymous_sessions"]
+            assert breakdown["authenticated_count"] == payload["visitor_summary"]["logged_in_visitors"]
+            assert breakdown["total_count"] == (
+                breakdown["anonymous_count"] + breakdown["authenticated_count"]
+            )
+            assert breakdown["anonymous_ratio"] >= 0
+            assert breakdown["authenticated_ratio"] >= 0
         assert standard_dashboard["premium"] is None
+        snapshots = premium_dashboard["premium"]["snapshots"]
+        assert snapshots
+        assert snapshots[0]["display_label"] == "会话 01"
+        assert snapshots[0]["visitor_label"] in {"匿名访客", "已登录访客"}
+        assert "persona_label" in snapshots[0]
+        assert "device_label" in snapshots[0]
+        assert "region_label" in snapshots[0]
+        assert "touch_count" in snapshots[0]
+        assert "token" not in snapshots[0]
         assert {
             "series",
             "journeys",

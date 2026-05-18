@@ -415,6 +415,111 @@ textarea {
     background: linear-gradient(90deg, var(--accent), #efba71);
 }
 
+.visitor-pie-layout {
+    display: grid;
+    grid-template-columns: 132px minmax(0, 1fr);
+    gap: 20px;
+    align-items: center;
+}
+
+.visitor-pie {
+    width: 132px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, var(--panel-strong) 0 42%, transparent 43%),
+        conic-gradient(
+            var(--secondary) 0deg var(--anonymous-deg),
+            var(--accent) var(--anonymous-deg) 360deg
+        );
+    box-shadow: inset 0 0 0 1px rgba(30, 36, 48, 0.1);
+}
+
+.visitor-pie-legend {
+    display: grid;
+    gap: 12px;
+}
+
+.visitor-pie-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.visitor-pie-row span:last-child {
+    color: var(--muted);
+}
+
+.snapshot-list {
+    display: grid;
+    gap: 12px;
+}
+
+.snapshot-card {
+    display: grid;
+    gap: 14px;
+    padding: 14px;
+    border: 1px solid rgba(30, 36, 48, 0.1);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 250, 242, 0.7);
+}
+
+.snapshot-card-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+}
+
+.snapshot-card-head strong {
+    font-family: var(--font-heading);
+}
+
+.snapshot-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    color: var(--secondary);
+    background: rgba(47, 122, 116, 0.12);
+    white-space: nowrap;
+}
+
+.snapshot-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.snapshot-fields div {
+    display: grid;
+    gap: 4px;
+}
+
+.snapshot-fields span {
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.snapshot-fields strong {
+    font-family: var(--font-heading);
+}
+
+.legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+}
+
+.legend-swatch.anonymous {
+    background: var(--secondary);
+}
+
+.legend-swatch.authenticated {
+    background: var(--accent);
+}
+
 .timeline-chart {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -483,5 +588,17 @@ textarea {
 
     .page-shell {
         width: min(100% - 20px, 1180px);
+    }
+
+    .visitor-pie-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .visitor-pie {
+        justify-self: center;
+    }
+
+    .snapshot-fields {
+        grid-template-columns: 1fr;
     }
 }

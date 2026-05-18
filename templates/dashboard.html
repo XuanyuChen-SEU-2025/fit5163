@@ -76,7 +76,7 @@
                 </div>
             </div>
             {% else %}
-            <p class="muted">当前还没有可展示的访客画像。</p>
+            <p class="muted">当前还没有可展示的访客数据。</p>
             {% endfor %}
         </div>
     </article>
@@ -85,7 +85,41 @@
         <div class="section-head tight">
             <div>
                 <p class="eyebrow">基础权限</p>
-                <h2>访客身份分布</h2>
+                <h2>访客类型占比</h2>
+            </div>
+        </div>
+        {% set visitor_breakdown = dashboard.visitor_type_breakdown %}
+        {% if visitor_breakdown.total_count > 0 %}
+        <div class="visitor-pie-layout" data-visitor-type-chart>
+            <div
+                class="visitor-pie"
+                style="--anonymous-deg: {{ visitor_breakdown.anonymous_degrees }}deg"
+                aria-label="访客类型占比"
+                role="img"
+            ></div>
+            <div class="visitor-pie-legend">
+                <div class="visitor-pie-row">
+                    <span class="legend-swatch anonymous"></span>
+                    <strong>匿名访客</strong>
+                    <span>{{ visitor_breakdown.anonymous_count }} / {{ visitor_breakdown.anonymous_ratio }}%</span>
+                </div>
+                <div class="visitor-pie-row">
+                    <span class="legend-swatch authenticated"></span>
+                    <strong>已登录访客</strong>
+                    <span>{{ visitor_breakdown.authenticated_count }} / {{ visitor_breakdown.authenticated_ratio }}%</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p class="muted" data-visitor-type-chart-empty>暂无访客数据</p>
+        {% endif %}
+    </article>
+
+    <article class="panel-card">
+        <div class="section-head tight">
+            <div>
+                <p class="eyebrow">基础权限</p>
+                <h2>访客活动汇总</h2>
             </div>
         </div>
         <div class="table-like">
@@ -199,11 +233,31 @@
                 <h2>近期会话快照</h2>
             </div>
         </div>
-        <div class="table-like">
+        <div class="snapshot-list">
             {% for snapshot in dashboard.premium.snapshots %}
-            <div class="table-row">
-                <strong>#{{ snapshot.token }}</strong>
-                <span>{{ snapshot.visitor_label }} / {{ snapshot.persona }} / {{ snapshot.device }} / {{ snapshot.region }} / {{ snapshot.touchpoints }} 次触点</span>
+            <div class="snapshot-card">
+                <div class="snapshot-card-head">
+                    <strong>{{ snapshot.display_label }}</strong>
+                    <span class="snapshot-badge">{{ snapshot.visitor_label }}</span>
+                </div>
+                <div class="snapshot-fields">
+                    <div>
+                        <span>访客分类</span>
+                        <strong>{{ snapshot.persona_label }}</strong>
+                    </div>
+                    <div>
+                        <span>访问设备</span>
+                        <strong>{{ snapshot.device_label }}</strong>
+                    </div>
+                    <div>
+                        <span>访问地区</span>
+                        <strong>{{ snapshot.region_label }}</strong>
+                    </div>
+                    <div>
+                        <span>触点次数</span>
+                        <strong>{{ snapshot.touch_count }}</strong>
+                    </div>
+                </div>
             </div>
             {% else %}
             <p class="muted">暂无近期会话。</p>
@@ -216,7 +270,7 @@
     <p class="eyebrow">权限隔离</p>
     <h2>高级分析已保护</h2>
     <p>
-        当前账号为普通博主，仅可查看总浏览量、点赞数、评论数与基础用户画像。
+        当前账号为普通博主，仅可查看总浏览量、点赞数、评论数与基础访客统计。
         用户行为路径图谱和时间序列统计仅对高级博主开放。
     </p>
 </section>
