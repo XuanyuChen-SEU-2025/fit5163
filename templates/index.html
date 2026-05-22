@@ -1,43 +1,43 @@
 {% extends "base.html" %}
 
-{% block title %}博客前台 | Secure Blog Analytics{% endblock %}
+{% block title %}Public Blog | Secure Blog Analytics{% endblock %}
 
 {% block content %}
 <section class="hero">
     <div class="hero-copy">
-        <p class="eyebrow">安全追踪 / 分层分析 / HTTPS 演示</p>
-        <h1>面向博主的多层级博客活动分析系统</h1>
+        <p class="eyebrow">Secure tracking / Tiered analytics / HTTPS demo</p>
+        <h1>Tiered Blog Activity Analytics for Bloggers</h1>
         <p class="hero-text">
-            这个演示站点会安全记录页面浏览、停留时长、点赞、评论和分享行为，
-            匿名访客会生成 anonymous activity data；已登录访客会生成 linked visitor account activity。
-            Blogger accounts 独立用于后台 analytics access。
+            This demo site securely records page views, dwell time, likes, comments, and shares.
+            Anonymous visitors generate anonymous activity data, while logged-in visitors generate linked visitor account activity.
+            Blogger accounts are separate and are used only for dashboard analytics access.
         </p>
         <div class="hero-actions">
-            <a class="primary-button" href="{{ url_for('login') }}">查看博主仪表盘</a>
+            <a class="primary-button" href="{{ url_for('login') }}">View Blogger Dashboard</a>
             {% if current_visitor %}
-            <span class="chip">已登录访客：{{ current_visitor.display_name }}</span>
+            <span class="chip">Logged-in visitor: {{ current_visitor.display_name }}</span>
             {% else %}
-            <a class="secondary-button" href="{{ url_for('visitor_login') }}">访客登录</a>
-            <span class="chip">当前：匿名访客</span>
+            <a class="secondary-button" href="{{ url_for('visitor_login') }}">Visitor login</a>
+            <span class="chip">Current: Anonymous visitor</span>
             {% endif %}
-            <span class="chip">开发模式默认以 HTTPS/TLS 启动</span>
+            <span class="chip">Development mode starts with HTTPS/TLS by default</span>
         </div>
     </div>
     <div class="hero-panel">
         <div class="metric-glow">
-            <span>安全事件落库</span>
-            <strong>浏览 / 停留 / 互动 / 评论 / 分享</strong>
+            <span>Secure event storage</span>
+            <strong>Views / Dwell / Interactions / Comments / Shares</strong>
         </div>
         <div class="metric-grid compact">
             <article class="metric-card">
-                <span>普通博主</span>
-                <strong>基础指标</strong>
-                <small>总浏览量、点赞、基础画像</small>
+                <span>Basic Blogger</span>
+                <strong>Basic Metrics</strong>
+                <small>Total views, likes, basic personas</small>
             </article>
             <article class="metric-card">
-                <span>高级博主</span>
-                <strong>高级洞察</strong>
-                <small>行为路径图谱、时间序列</small>
+                <span>Premium Blogger</span>
+                <strong>Advanced Insights</strong>
+                <small>Journey mapping, time series</small>
             </article>
         </div>
     </div>
@@ -45,25 +45,25 @@
 
 <section class="section-head">
     <div>
-        <p class="eyebrow">博客前台界面</p>
-        <h2>文章列表</h2>
+        <p class="eyebrow">Public blog interface</p>
+        <h2>Articles</h2>
     </div>
-    <p class="muted">点击任意文章会自动记录页面浏览，离开页面时上报停留时长。</p>
+    <p class="muted">Clicking any article automatically records a page view, and leaving the page reports dwell time.</p>
 </section>
 
 <section class="card-grid">
     {% for post in posts %}
     <article class="post-card">
-        <p class="card-badge">{{ post.display_name }} / {{ "高级博主" if post.role == "premium" else "普通博主" }}</p>
+        <p class="card-badge">{{ post.display_name }} / {{ "Premium Blogger" if post.role == "premium" else "Basic Blogger" }}</p>
         <h3>{{ post.title }}</h3>
         <p>{{ post.excerpt }}</p>
         <div class="post-metrics">
-            <span>{{ post.views }} 浏览</span>
-            <span>{{ post.likes }} 点赞</span>
-            <span>{{ post.comments }} 评论</span>
-            <span>{{ post.shares }} 分享</span>
+            <span>{{ post.views }} views</span>
+            <span>{{ post.likes }} likes</span>
+            <span>{{ post.comments }} comments</span>
+            <span>{{ post.shares }} shares</span>
         </div>
-        <a class="inline-link" href="{{ url_for('post_detail', slug=post.slug) }}">进入文章</a>
+        <a class="inline-link" href="{{ url_for('post_detail', slug=post.slug) }}">Read article</a>
     </article>
     {% endfor %}
 </section>

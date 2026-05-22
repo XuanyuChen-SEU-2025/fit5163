@@ -1,40 +1,40 @@
 {% extends "base.html" %}
 
-{% block title %}博主登录 | Secure Blog Analytics{% endblock %}
+{% block title %}Blogger Login | Secure Blog Analytics{% endblock %}
 
 {% block content %}
 <section class="login-shell">
     <div class="login-card">
-        <p class="eyebrow">权限分级演示入口</p>
-        <h1>登录博主管理仪表盘</h1>
+        <p class="eyebrow">Role-based demo entry</p>
+        <h1>Log in to the Blogger Admin Dashboard</h1>
         <p class="muted">
             Blogger accounts are separate and are used only for dashboard analytics access.
-            普通博主只能看基础指标；高级博主可以访问完整用户行为路径图谱和时间序列数据。
+            Basic Bloggers can see only basic metrics; Premium Bloggers can access full journey mapping and time series data.
         </p>
         <form method="post" class="login-form">
             <label>
-                用户名
-                <input type="text" name="username" placeholder="lin 或 helen" required>
+                Username
+                <input type="text" name="username" placeholder="lin or helen" required>
             </label>
             <label>
-                密码
+                Password
                 <input type="password" name="password" placeholder="blog123" required>
             </label>
-            <button class="primary-button" type="submit">登录</button>
+            <button class="primary-button" type="submit">Log in</button>
         </form>
-        <p class="muted">前台 visitor 登录请使用 <a class="inline-link" href="{{ url_for('visitor_login') }}">访客登录</a>。</p>
+        <p class="muted">For public visitor login, use <a class="inline-link" href="{{ url_for('visitor_login') }}">Visitor login</a>.</p>
     </div>
     <div class="demo-card">
-        <h2>演示账号</h2>
+        <h2>Demo Accounts</h2>
         <div class="demo-row">
-            <span>普通博主</span>
+            <span>Basic Blogger</span>
             <strong>lin / blog123</strong>
         </div>
         <div class="demo-row">
-            <span>高级博主</span>
+            <span>Premium Blogger</span>
             <strong>helen / blog123</strong>
         </div>
-        <p class="muted">两个账号都会进入同一套后台，但数据权限不同。</p>
+        <p class="muted">Both accounts use the same dashboard, but their data permissions differ.</p>
     </div>
 </section>
 {% endblock %}

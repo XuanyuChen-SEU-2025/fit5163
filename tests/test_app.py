@@ -68,7 +68,7 @@ def test_anonymous_visitor_can_browse_and_comment_as_anonymous():
 
     response = client.get("/post/secure-content-growth")
     assert response.status_code == 200
-    assert "当前为匿名访客" in response.get_data(as_text=True)
+    assert "Current visitor is anonymous" in response.get_data(as_text=True)
     with client.session_transaction() as sess:
         assert "visitor" not in sess
         token = sess["_csrf_token"]
@@ -197,8 +197,8 @@ def test_public_pages_do_not_expose_dashboard_only_analytics():
     assert "journey-list" not in index_html
     assert "timeline-chart" not in index_html
     assert "session snapshots" not in index_html.lower()
-    assert "近期会话快照" not in index_html
-    assert "访客类型占比" not in index_html
+    assert "Recent Session Snapshots" not in index_html
+    assert "Visitor Type Share" not in index_html
     assert "data-visitor-type-chart" not in index_html
 
     post_response = client.get("/post/secure-content-growth")
@@ -209,20 +209,20 @@ def test_public_pages_do_not_expose_dashboard_only_analytics():
     assert 'data-metric="shares"' in post_html
     assert 'data-metric="comments"' in post_html
     assert 'data-metric="avg_dwell"' not in post_html
-    assert "平均停留" not in post_html
+    assert "Avg. Dwell" not in post_html
     assert "persona_segment" not in post_html
     assert "journey-list" not in post_html
     assert "timeline-chart" not in post_html
-    assert "近期会话快照" not in post_html
-    assert "访客类型占比" not in post_html
+    assert "Recent Session Snapshots" not in post_html
+    assert "Visitor Type Share" not in post_html
     assert "data-visitor-type-chart" not in post_html
 
     visitor_client = app.test_client()
     visitor_response = login_visitor(visitor_client)
     visitor_html = visitor_response.get_data(as_text=True)
     assert visitor_response.status_code == 200
-    assert "近期会话快照" not in visitor_html
-    assert "会话 01" not in visitor_html
+    assert "Recent Session Snapshots" not in visitor_html
+    assert "Session 01" not in visitor_html
 
 
 def test_basic_and_premium_dashboards_render_visitor_type_pie():
@@ -238,15 +238,15 @@ def test_basic_and_premium_dashboards_render_visitor_type_pie():
     )
     basic_html = basic_response.get_data(as_text=True)
     assert basic_response.status_code == 200
-    assert "访客用户画像" in basic_html
+    assert "Visitor Personas" in basic_html
     assert legacy_anonymous_distribution not in basic_html
     assert legacy_anonymous_stats not in basic_html
-    assert "访客类型占比" in basic_html
-    assert "匿名访客" in basic_html
-    assert "已登录访客" in basic_html
+    assert "Visitor Type Share" in basic_html
+    assert "Anonymous visitor" in basic_html
+    assert "Logged-in visitor" in basic_html
     assert "data-visitor-type-chart" in basic_html
-    assert "近期会话快照" not in basic_html
-    assert "会话 01" not in basic_html
+    assert "Recent Session Snapshots" not in basic_html
+    assert "Session 01" not in basic_html
 
     client = app.test_client()
     premium_response = client.post(
@@ -256,19 +256,19 @@ def test_basic_and_premium_dashboards_render_visitor_type_pie():
     )
     premium_html = premium_response.get_data(as_text=True)
     assert premium_response.status_code == 200
-    assert "访客用户画像" in premium_html
+    assert "Visitor Personas" in premium_html
     assert legacy_anonymous_distribution not in premium_html
     assert legacy_anonymous_stats not in premium_html
-    assert "访客类型占比" in premium_html
-    assert "匿名访客" in premium_html
-    assert "已登录访客" in premium_html
+    assert "Visitor Type Share" in premium_html
+    assert "Anonymous visitor" in premium_html
+    assert "Logged-in visitor" in premium_html
     assert "data-visitor-type-chart" in premium_html
-    assert "近期会话快照" in premium_html
-    assert "会话 01" in premium_html
-    assert "访客分类" in premium_html
-    assert "访问设备" in premium_html
-    assert "访问地区" in premium_html
-    assert "触点次数" in premium_html
+    assert "Recent Session Snapshots" in premium_html
+    assert "Session 01" in premium_html
+    assert "Visitor Type" in premium_html
+    assert "Device" in premium_html
+    assert "Region" in premium_html
+    assert "Touchpoints" in premium_html
 
     with app.app_context():
         db = get_db()
@@ -434,8 +434,8 @@ def test_dashboard_login_role_levels_are_server_side():
         assert standard_dashboard["premium"] is None
         snapshots = premium_dashboard["premium"]["snapshots"]
         assert snapshots
-        assert snapshots[0]["display_label"] == "会话 01"
-        assert snapshots[0]["visitor_label"] in {"匿名访客", "已登录访客"}
+        assert snapshots[0]["display_label"] == "Session 01"
+        assert snapshots[0]["visitor_label"] in {"Anonymous visitor", "Logged-in visitor"}
         assert "persona_label" in snapshots[0]
         assert "device_label" in snapshots[0]
         assert "region_label" in snapshots[0]

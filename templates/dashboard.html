@@ -1,57 +1,57 @@
 {% extends "base.html" %}
 
-{% block title %}博主管理仪表盘 | Secure Blog Analytics{% endblock %}
+{% block title %}Blogger Dashboard | Secure Blog Analytics{% endblock %}
 
 {% block content %}
 <section class="dashboard-hero">
     <div>
-        <p class="eyebrow">分层分析仪表盘</p>
-        <h1>{{ blogger.display_name }} 的内容分析中心</h1>
+        <p class="eyebrow">Tiered analytics dashboard</p>
+        <h1>{{ blogger.display_name }}'s Content Analytics Center</h1>
         <p class="hero-text">
-            当前角色：
-            <span class="chip">{{ "高级博主" if blogger.role == "premium" else "普通博主" }}</span>
+            Current role:
+            <span class="chip">{{ "Premium Blogger" if blogger.role == "premium" else "Basic Blogger" }}</span>
         </p>
     </div>
     <div class="hero-panel slim">
-        <strong>安全策略</strong>
-        <p>HTTPS/TLS 传输、敏感明细加密存储、CSRF 防护、Secure Cookie。</p>
+        <strong>Security Policy</strong>
+        <p>HTTPS/TLS transport, encrypted sensitive details at rest, CSRF protection, Secure Cookies.</p>
     </div>
 </section>
 
 <section class="metric-grid">
     <article class="metric-card">
-        <span>总浏览量</span>
+        <span>Total Views</span>
         <strong>{{ dashboard.metrics.views }}</strong>
     </article>
     <article class="metric-card">
-        <span>点赞数</span>
+        <span>Likes</span>
         <strong>{{ dashboard.metrics.likes }}</strong>
     </article>
     <article class="metric-card">
-        <span>评论数</span>
+        <span>Comments</span>
         <strong>{{ dashboard.metrics.comments }}</strong>
     </article>
     <article class="metric-card">
-        <span>平均停留时长</span>
+        <span>Avg. Dwell Time</span>
         <strong>{{ dashboard.metrics.avg_dwell }}s</strong>
     </article>
 </section>
 
 <section class="metric-grid">
     <article class="metric-card">
-        <span>总访客数</span>
+        <span>Total Visitors</span>
         <strong>{{ dashboard.visitor_summary.total_visitors }}</strong>
     </article>
     <article class="metric-card">
-        <span>匿名访客</span>
+        <span>Anonymous Visitors</span>
         <strong>{{ dashboard.visitor_summary.anonymous_sessions }}</strong>
     </article>
     <article class="metric-card">
-        <span>已登录访客</span>
+        <span>Logged-in Visitors</span>
         <strong>{{ dashboard.visitor_summary.logged_in_visitors }}</strong>
     </article>
     <article class="metric-card">
-        <span>已登录访客活动</span>
+        <span>Logged-in Visitor Activity</span>
         <strong>{{ dashboard.visitor_summary.logged_in_activity }}</strong>
     </article>
 </section>
@@ -60,8 +60,8 @@
     <article class="panel-card">
         <div class="section-head tight">
             <div>
-                <p class="eyebrow">基础权限</p>
-                <h2>访客用户画像</h2>
+                <p class="eyebrow">Basic access</p>
+                <h2>Visitor Personas</h2>
             </div>
         </div>
         <div class="persona-list">
@@ -69,14 +69,14 @@
             <div class="persona-item">
                 <div class="persona-text">
                     <strong>{{ persona.label }}</strong>
-                    <span>{{ persona.count }} 次浏览</span>
+                    <span>{{ persona.count }} views</span>
                 </div>
                 <div class="bar-track">
                     <div class="bar-fill" style="width: {{ persona.ratio }}%"></div>
                 </div>
             </div>
             {% else %}
-            <p class="muted">当前还没有可展示的访客数据。</p>
+            <p class="muted">No visitor data to display yet.</p>
             {% endfor %}
         </div>
     </article>
@@ -84,8 +84,8 @@
     <article class="panel-card">
         <div class="section-head tight">
             <div>
-                <p class="eyebrow">基础权限</p>
-                <h2>访客类型占比</h2>
+                <p class="eyebrow">Basic access</p>
+                <h2>Visitor Type Share</h2>
             </div>
         </div>
         {% set visitor_breakdown = dashboard.visitor_type_breakdown %}
@@ -94,42 +94,42 @@
             <div
                 class="visitor-pie"
                 style="--anonymous-deg: {{ visitor_breakdown.anonymous_degrees }}deg"
-                aria-label="访客类型占比"
+                aria-label="Visitor type share"
                 role="img"
             ></div>
             <div class="visitor-pie-legend">
                 <div class="visitor-pie-row">
                     <span class="legend-swatch anonymous"></span>
-                    <strong>匿名访客</strong>
+                    <strong>Anonymous visitors</strong>
                     <span>{{ visitor_breakdown.anonymous_count }} / {{ visitor_breakdown.anonymous_ratio }}%</span>
                 </div>
                 <div class="visitor-pie-row">
                     <span class="legend-swatch authenticated"></span>
-                    <strong>已登录访客</strong>
+                    <strong>Logged-in visitors</strong>
                     <span>{{ visitor_breakdown.authenticated_count }} / {{ visitor_breakdown.authenticated_ratio }}%</span>
                 </div>
             </div>
         </div>
         {% else %}
-        <p class="muted" data-visitor-type-chart-empty>暂无访客数据</p>
+        <p class="muted" data-visitor-type-chart-empty>No visitor data yet</p>
         {% endif %}
     </article>
 
     <article class="panel-card">
         <div class="section-head tight">
             <div>
-                <p class="eyebrow">基础权限</p>
-                <h2>访客活动汇总</h2>
+                <p class="eyebrow">Basic access</p>
+                <h2>Visitor Activity Summary</h2>
             </div>
         </div>
         <div class="table-like">
             {% for item in dashboard.visitor_types %}
             <div class="table-row">
                 <strong>{{ item.label }}</strong>
-                <span>{{ item.activity_count }} 次活动 / {{ item.session_count }} 个 session / {{ item.account_count }} 个账号</span>
+                <span>{{ item.activity_count }} activities / {{ item.session_count }} sessions / {{ item.account_count }} accounts</span>
             </div>
             {% else %}
-            <p class="muted">暂时没有访客行为数据。</p>
+            <p class="muted">No visitor behavior data yet.</p>
             {% endfor %}
         </div>
     </article>
@@ -137,18 +137,18 @@
     <article class="panel-card">
         <div class="section-head tight">
             <div>
-                <p class="eyebrow">基础权限</p>
-                <h2>文章表现</h2>
+                <p class="eyebrow">Basic access</p>
+                <h2>Post Performance</h2>
             </div>
         </div>
         <div class="table-like">
             {% for post in dashboard.top_posts %}
             <div class="table-row">
                 <strong>{{ post.title }}</strong>
-                <span>{{ post.views }} 浏览 / {{ post.likes }} 赞 / {{ post.comments }} 评 / {{ post.shares }} 分享</span>
+                <span>{{ post.views }} views / {{ post.likes }} likes / {{ post.comments }} comments / {{ post.shares }} shares</span>
             </div>
             {% else %}
-            <p class="muted">还没有文章数据。</p>
+            <p class="muted">No post data yet.</p>
             {% endfor %}
         </div>
     </article>
@@ -157,10 +157,10 @@
 {% if blogger.role == "premium" and dashboard.premium %}
 <section class="section-head">
     <div>
-        <p class="eyebrow">高级权限</p>
-        <h2>时间序列统计</h2>
+        <p class="eyebrow">Premium access</p>
+        <h2>Time Series Metrics</h2>
     </div>
-    <p class="muted">最近 7 天的浏览趋势，适合观察内容发布后的持续热度。</p>
+    <p class="muted">View trends from the last 7 days to understand sustained engagement after publishing.</p>
 </section>
 
 <section class="timeline-chart panel-card">
@@ -177,8 +177,8 @@
     <article class="panel-card">
         <div class="section-head tight">
             <div>
-                <p class="eyebrow">高级权限</p>
-                <h2>匿名访问路径</h2>
+                <p class="eyebrow">Premium access</p>
+                <h2>Anonymous Visitor Journeys</h2>
             </div>
         </div>
         <div class="journey-list">
@@ -192,10 +192,10 @@
                 <div class="bar-track">
                     <div class="bar-fill accent" style="width: {{ path.ratio }}%"></div>
                 </div>
-                <small>{{ path.count }} 次触发</small>
+                <small>{{ path.count }} triggers</small>
             </div>
             {% else %}
-            <p class="muted">暂无足够的匿名访问路径数据。</p>
+            <p class="muted">Not enough anonymous journey data yet.</p>
             {% endfor %}
         </div>
     </article>
@@ -203,8 +203,8 @@
     <article class="panel-card">
         <div class="section-head tight">
             <div>
-                <p class="eyebrow">高级权限</p>
-                <h2>已登录访客路径</h2>
+                <p class="eyebrow">Premium access</p>
+                <h2>Logged-in Visitor Journeys</h2>
             </div>
         </div>
         <div class="journey-list">
@@ -218,10 +218,10 @@
                 <div class="bar-track">
                     <div class="bar-fill accent" style="width: {{ path.ratio }}%"></div>
                 </div>
-                <small>{{ path.count }} 次触发</small>
+                <small>{{ path.count }} triggers</small>
             </div>
             {% else %}
-            <p class="muted">暂无足够的已登录访客路径数据。</p>
+            <p class="muted">Not enough logged-in visitor journey data yet.</p>
             {% endfor %}
         </div>
     </article>
@@ -229,8 +229,8 @@
     <article class="panel-card">
         <div class="section-head tight">
             <div>
-                <p class="eyebrow">高级权限</p>
-                <h2>近期会话快照</h2>
+                <p class="eyebrow">Premium access</p>
+                <h2>Recent Session Snapshots</h2>
             </div>
         </div>
         <div class="snapshot-list">
@@ -242,36 +242,36 @@
                 </div>
                 <div class="snapshot-fields">
                     <div>
-                        <span>访客分类</span>
+                        <span>Visitor Type</span>
                         <strong>{{ snapshot.persona_label }}</strong>
                     </div>
                     <div>
-                        <span>访问设备</span>
+                        <span>Device</span>
                         <strong>{{ snapshot.device_label }}</strong>
                     </div>
                     <div>
-                        <span>访问地区</span>
+                        <span>Region</span>
                         <strong>{{ snapshot.region_label }}</strong>
                     </div>
                     <div>
-                        <span>触点次数</span>
+                        <span>Touchpoints</span>
                         <strong>{{ snapshot.touch_count }}</strong>
                     </div>
                 </div>
             </div>
             {% else %}
-            <p class="muted">暂无近期会话。</p>
+            <p class="muted">No recent sessions.</p>
             {% endfor %}
         </div>
     </article>
 </section>
 {% else %}
 <section class="panel-card lock-panel">
-    <p class="eyebrow">权限隔离</p>
-    <h2>高级分析已保护</h2>
+    <p class="eyebrow">Access isolation</p>
+    <h2>Advanced Analytics Protected</h2>
     <p>
-        当前账号为普通博主，仅可查看总浏览量、点赞数、评论数与基础访客用户画像。
-        用户行为路径图谱和时间序列统计仅对高级博主开放。
+        The current account is a Basic Blogger and can only view total views, likes, comments, and basic visitor personas.
+        Journey mapping and time series analytics are available only to Premium Bloggers.
     </p>
 </section>
 {% endif %}

@@ -11,21 +11,21 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from .db import get_db
 
-PERSONA_SEGMENTS = ["内容创业者", "学生群体", "开发者", "产品经理", "自由撰稿人"]
-REGIONS = ["上海", "北京", "深圳", "杭州", "成都", "新加坡", "悉尼"]
+PERSONA_SEGMENTS = ["Content Entrepreneurs", "Students", "Developers", "Product Managers", "Freelance Writers"]
+REGIONS = ["Shanghai", "Beijing", "Shenzhen", "Hangzhou", "Chengdu", "Singapore", "Sydney"]
 COMMENT_SNIPPETS = [
-    "这篇文章的安全设计思路非常清楚。",
-    "仪表盘的分层展示很适合团队协作。",
-    "能否再补一个访客来源维度？",
-    "我很喜欢把行为轨迹和时间序列结合展示的方式。",
+    "The security design in this article is very clear.",
+    "The dashboard's tiered view works well for team collaboration.",
+    "Could you add another dimension for visitor sources?",
+    "I like how the journey path and time series are shown together.",
 ]
 EVENT_LABELS = {
-    "home_view": "首页",
-    "page_view": "文章浏览",
-    "like": "点赞",
-    "comment": "评论",
-    "share": "分享",
-    "dwell_time": "停留",
+    "home_view": "Home",
+    "page_view": "Article View",
+    "like": "Like",
+    "comment": "Comment",
+    "share": "Share",
+    "dwell_time": "Dwell",
 }
 
 
@@ -54,7 +54,7 @@ class BlogAnalyticsService:
             (
                 "lin",
                 generate_password_hash("blog123"),
-                "林岚",
+                "Lin Lan",
                 "standard",
                 "专注内容增长与基础运营复盘。",
                 created_at,
@@ -62,7 +62,7 @@ class BlogAnalyticsService:
             (
                 "helen",
                 generate_password_hash("blog123"),
-                "何念",
+                "Helen He",
                 "premium",
                 "关注安全、增长与高阶分析实践。",
                 created_at,
@@ -84,44 +84,44 @@ class BlogAnalyticsService:
             (
                 blogger_map["lin"]["id"],
                 "secure-content-growth",
-                "安全内容增长的三层漏斗",
-                "把访问、互动和转化统一到一个可追踪的博客增长模型。",
+                "Three-Layer Funnel for Secure Content Growth",
+                "Unify visits, engagement, and conversion into one trackable blog growth model.",
                 (
-                    "我们把博客活动拆成首页触达、文章消费和互动转化三层，"
-                    "再通过安全追踪把浏览、停留和互动事件统一落库。"
+                    "We split blog activity into homepage reach, article consumption, and interaction conversion, "
+                    "then use secure tracking to store views, dwell time, and interaction events together."
                 ),
                 created_at,
             ),
             (
                 blogger_map["lin"]["id"],
                 "basic-metrics-playbook",
-                "基础指标看板如何真正帮到普通博主",
-                "总浏览量、点赞和画像标签并不只是展示，它们决定了复盘节奏。",
+                "How Basic Metrics Dashboards Help Basic Bloggers",
+                "Total views, likes, and persona tags do more than display data; they shape the review rhythm.",
                 (
-                    "对普通博主来说，聚焦高频基础指标能更快发现哪些内容值得持续投入，"
-                    "而不会在复杂图表中迷失。"
+                    "For Basic Bloggers, focusing on frequent core metrics makes it easier to see which content deserves continued investment "
+                    "without getting lost in complex charts."
                 ),
                 created_at,
             ),
             (
                 blogger_map["helen"]["id"],
                 "zero-trust-analytics",
-                "零信任思路下的内容分析平台",
-                "从传输到存储都按最小暴露面设计用户行为分析系统。",
+                "A Content Analytics Platform Built on Zero Trust",
+                "Design a user behavior analytics system with minimal exposure from transport to storage.",
                 (
-                    "高级分析不意味着牺牲隐私。我们可以把敏感明细加密存储，"
-                    "同时保留对时间序列和行为路径的可解释性。"
+                    "Advanced analytics does not have to sacrifice privacy. We can encrypt sensitive details at rest "
+                    "while preserving interpretability for time series and behavior paths."
                 ),
                 created_at,
             ),
             (
                 blogger_map["helen"]["id"],
                 "journey-mapping-for-bloggers",
-                "博主专属的用户行为路径图谱",
-                "从首页进入到分享扩散，路径图谱帮助高级博主识别关键行为节点。",
+                "User Journey Mapping for Bloggers",
+                "From homepage entry to shared reach, journey maps help Premium Bloggers identify key behavior nodes.",
                 (
-                    "当我们知道用户从哪里来、在哪篇文章停留更久、"
-                    "又会在什么节点点赞或评论，运营动作就能更加精细。"
+                    "When we know where users come from, which articles they spend more time on, "
+                    "and where they like or comment, operations can become much more precise."
                 ),
                 created_at,
             ),
@@ -157,7 +157,7 @@ class BlogAnalyticsService:
                     path="/",
                     dwell_seconds=0,
                     details={
-                        "journey_step": "首页",
+                        "journey_step": "Home",
                         "source": "seed",
                     },
                     occurred_at=to_iso(timestamp),
@@ -173,7 +173,7 @@ class BlogAnalyticsService:
                     path=f"/post/{post['slug']}",
                     dwell_seconds=0,
                     details={
-                        "journey_step": f"阅读《{post['title']}》",
+                        "journey_step": f"Read: {post['title']}",
                         "referrer": "首页推荐",
                     },
                     occurred_at=to_iso(view_time),
@@ -189,7 +189,7 @@ class BlogAnalyticsService:
                     path=f"/post/{post['slug']}",
                     dwell_seconds=dwell_seconds,
                     details={
-                        "journey_step": "深度阅读",
+                        "journey_step": "Deep read",
                         "seconds": dwell_seconds,
                     },
                     occurred_at=to_iso(view_time + timedelta(minutes=1)),
@@ -204,7 +204,7 @@ class BlogAnalyticsService:
                         event_type="like",
                         path=f"/post/{post['slug']}",
                         dwell_seconds=0,
-                        details={"journey_step": "点赞"},
+                        details={"journey_step": "Like"},
                         occurred_at=to_iso(view_time + timedelta(minutes=2)),
                     )
 
@@ -218,14 +218,14 @@ class BlogAnalyticsService:
                         path=f"/post/{post['slug']}",
                         dwell_seconds=0,
                         details={
-                            "journey_step": "分享",
+                            "journey_step": "Share",
                             "channel": rnd.choice(["微信", "微博", "复制链接"]),
                         },
                         occurred_at=to_iso(view_time + timedelta(minutes=3)),
                     )
 
                 if rnd.random() < 0.22:
-                    author_alias = rnd.choice(["晨光", "Kevin", "Olivia", "Mia"])
+                    author_alias = rnd.choice(["Dawn", "Kevin", "Olivia", "Mia"])
                     content = rnd.choice(COMMENT_SNIPPETS)
                     self._insert_comment(
                         db,
@@ -244,7 +244,7 @@ class BlogAnalyticsService:
                         event_type="comment",
                         path=f"/post/{post['slug']}",
                         dwell_seconds=0,
-                        details={"journey_step": "评论"},
+                        details={"journey_step": "Comment"},
                         occurred_at=to_iso(view_time + timedelta(minutes=4)),
                     )
 
@@ -521,7 +521,7 @@ class BlogAnalyticsService:
             path="/",
             dwell_seconds=0,
             details=self._with_visitor_details({
-                "journey_step": "首页",
+                "journey_step": "Home",
                 "surface": "frontpage",
             }, visitor),
         )
@@ -538,7 +538,7 @@ class BlogAnalyticsService:
             path=f"/post/{post['slug']}",
             dwell_seconds=0,
             details=self._with_visitor_details({
-                "journey_step": f"阅读《{post['title']}》",
+                "journey_step": f"Read: {post['title']}",
                 "post_title": post["title"],
                 "referrer": request.referrer or "直接访问",
             }, visitor),
@@ -557,7 +557,7 @@ class BlogAnalyticsService:
             path=f"/post/{post['slug']}",
             dwell_seconds=seconds,
             details=self._with_visitor_details({
-                "journey_step": "深度阅读",
+                "journey_step": "Deep read",
                 "seconds": seconds,
             }, visitor),
         )
@@ -575,7 +575,7 @@ class BlogAnalyticsService:
             event_type="like",
             path=f"/post/{post['slug']}",
             dwell_seconds=0,
-            details=self._with_visitor_details({"journey_step": "点赞"}, visitor),
+            details=self._with_visitor_details({"journey_step": "Like"}, visitor),
         )
         return self.get_post_metrics(post_id)
 
@@ -593,7 +593,7 @@ class BlogAnalyticsService:
             path=f"/post/{post['slug']}",
             dwell_seconds=0,
             details=self._with_visitor_details({
-                "journey_step": "分享",
+                "journey_step": "Share",
                 "channel": channel,
             }, visitor),
         )
@@ -629,7 +629,7 @@ class BlogAnalyticsService:
             path=f"/post/{post['slug']}",
             dwell_seconds=0,
             details=self._with_visitor_details({
-                "journey_step": "评论",
+                "journey_step": "Comment",
                 "author_alias": display_alias,
             }, visitor),
             occurred_at=created_at,
@@ -777,7 +777,7 @@ class BlogAnalyticsService:
             },
             "visitor_types": [
                 {
-                    "label": "已登录访客" if row["visitor_type"] == "authenticated" else "匿名访客",
+                    "label": "Logged-in visitor" if row["visitor_type"] == "authenticated" else "Anonymous visitor",
                     "visitor_type": row["visitor_type"],
                     "activity_count": row["activity_count"],
                     "session_count": row["session_count"],
@@ -924,12 +924,12 @@ class BlogAnalyticsService:
         for index, row in enumerate(rows, start=1):
             snapshots.append(
                 {
-                    "display_label": f"会话 {index:02d}",
+                    "display_label": f"Session {index:02d}",
                     "visitor_type": row["visitor_type"],
                     "visitor_label": (
-                        "已登录访客"
+                        "Logged-in visitor"
                         if row["visitor_type"] == "authenticated"
-                        else "匿名访客"
+                        else "Anonymous visitor"
                     ),
                     "persona_label": row["persona_segment"],
                     "device_label": row["device_type"],
@@ -948,7 +948,7 @@ class BlogAnalyticsService:
             "id": int(visitor["id"]),
             "username": visitor.get("username", ""),
             "email": visitor.get("email"),
-            "display_name": visitor.get("display_name") or visitor.get("username", "访客"),
+            "display_name": visitor.get("display_name") or visitor.get("username", "Visitor"),
         }
 
     def _with_visitor_details(self, details: dict, visitor: dict) -> dict:
@@ -970,7 +970,7 @@ class BlogAnalyticsService:
         visitor_account: dict | None = None,
     ) -> dict:
         digest = int(hashlib.sha256(session_token.encode("utf-8")).hexdigest(), 16)
-        device_type = "移动端" if "Mobile" in user_agent else "桌面端"
+        device_type = "Mobile" if "Mobile" in user_agent else "Desktop"
         persona_segment = PERSONA_SEGMENTS[digest % len(PERSONA_SEGMENTS)]
         region = REGIONS[(digest // 7) % len(REGIONS)]
         remote_addr = request.remote_addr if has_request_context() else session_token

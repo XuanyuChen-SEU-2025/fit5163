@@ -5,68 +5,68 @@
 {% block content %}
 <section class="post-layout" data-post-root data-post-id="{{ post.id }}">
     <article class="article-card">
-        <p class="eyebrow">{{ post.display_name }} / {{ "高级博主" if post.role == "premium" else "普通博主" }}</p>
+        <p class="eyebrow">{{ post.display_name }} / {{ "Premium Blogger" if post.role == "premium" else "Basic Blogger" }}</p>
         <h1>{{ post.title }}</h1>
         <p class="lead">{{ post.excerpt }}</p>
         <div class="article-body">
             <p>{{ post.content }}</p>
             <p>
-                系统会把行为事件通过加密明细写入数据库，并在后台按博主角色暴露不同层级的分析能力。
-                当前页面的浏览与停留时间也会纳入统计。
+                The system writes behavioral events to the database with encrypted details and exposes different levels of analytics based on the blogger role.
+                Views and dwell time on this page are also included in the metrics.
             </p>
         </div>
     </article>
 
     <aside class="analytics-panel">
         <div class="panel-card">
-            <p class="eyebrow">实时互动</p>
+            <p class="eyebrow">Live interaction</p>
             <div class="metric-grid">
                 <article class="metric-card">
-                    <span>浏览量</span>
+                    <span>Views</span>
                     <strong data-metric="views">{{ post.metrics.views }}</strong>
                 </article>
                 <article class="metric-card">
-                    <span>点赞</span>
+                    <span>Likes</span>
                     <strong data-metric="likes">{{ post.metrics.likes }}</strong>
                 </article>
                 <article class="metric-card">
-                    <span>&#20998;&#20139;</span>
+                    <span>Shares</span>
                     <strong data-metric="shares">{{ post.metrics.shares }}</strong>
                 </article>
                 <article class="metric-card">
-                    <span>评论</span>
+                    <span>Comments</span>
                     <strong data-metric="comments">{{ post.metrics.comments }}</strong>
                 </article>
             </div>
             <div class="action-row">
-                <button class="primary-button" type="button" data-action="like" data-post-id="{{ post.id }}">点赞</button>
-                <button class="secondary-button" type="button" data-action="share" data-post-id="{{ post.id }}">分享</button>
+                <button class="primary-button" type="button" data-action="like" data-post-id="{{ post.id }}">Like</button>
+                <button class="secondary-button" type="button" data-action="share" data-post-id="{{ post.id }}">Share</button>
             </div>
             {% if current_visitor %}
-            <p class="muted">当前为已登录访客：{{ current_visitor.display_name }}，互动会绑定到 visitor account。</p>
+            <p class="muted">Current visitor is logged in as {{ current_visitor.display_name }}; interactions are linked to the visitor account.</p>
             {% else %}
-            <p class="muted">当前为匿名访客，互动会记录为 anonymous visitor session。</p>
+            <p class="muted">Current visitor is anonymous; interactions are recorded as an anonymous visitor session.</p>
             {% endif %}
         </div>
 
         <div class="panel-card">
-            <p class="eyebrow">发表评论</p>
+            <p class="eyebrow">Comment</p>
             <form class="comment-form" method="post" action="{{ url_for('comment_post', post_id=post.id) }}" data-comment-form data-post-id="{{ post.id }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                 {% if current_visitor %}
                 <input type="hidden" name="author_alias" value="{{ current_visitor.display_name }}">
-                <p class="muted">评论将显示为 {{ current_visitor.display_name }}。</p>
+                <p class="muted">Your comment will appear as {{ current_visitor.display_name }}.</p>
                 {% else %}
                 <label>
-                    昵称
-                    <input type="text" name="author_alias" maxlength="20" placeholder="例如：小雨">
+                    Nickname
+                    <input type="text" name="author_alias" maxlength="20" placeholder="e.g., Alex">
                 </label>
                 {% endif %}
                 <label>
-                    评论内容
-                    <textarea name="content" rows="4" maxlength="240" placeholder="分享一下你的想法..." required></textarea>
+                    Comment
+                    <textarea name="content" rows="4" maxlength="240" placeholder="Share your thoughts..." required></textarea>
                 </label>
-                <button class="primary-button" type="submit">提交评论</button>
+                <button class="primary-button" type="submit">Submit Comment</button>
             </form>
         </div>
     </aside>
@@ -74,10 +74,10 @@
 
 <section class="section-head">
     <div>
-        <p class="eyebrow">最新评论</p>
-        <h2>加密存储后按需解密展示</h2>
+        <p class="eyebrow">Latest comments</p>
+        <h2>Encrypted at rest, decrypted for display</h2>
     </div>
-    <p class="muted">评论原文不会以明文方式直接落库。</p>
+    <p class="muted">Comment text is not stored directly as plaintext.</p>
 </section>
 
 <section class="comment-list" data-comment-list>
@@ -85,14 +85,14 @@
     <article class="comment-card">
         <div class="comment-meta">
             <strong>{{ comment.author_alias }}</strong>
-            <span>{{ "已登录访客" if comment.visitor_type == "authenticated" else "匿名访客" }}</span>
+            <span>{{ "Logged-in visitor" if comment.visitor_type == "authenticated" else "Anonymous visitor" }}</span>
             <span>{{ comment.created_at }}</span>
         </div>
         <p>{{ comment.content }}</p>
     </article>
     {% else %}
     <article class="comment-card empty">
-        <p>还没有评论，来留下第一条互动吧。</p>
+        <p>No comments yet. Be the first to interact.</p>
     </article>
     {% endfor %}
 </section>

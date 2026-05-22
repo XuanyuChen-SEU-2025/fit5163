@@ -15,26 +15,26 @@
                 <span>Secure Blog Analytics</span>
             </a>
             <nav class="topnav">
-                <a href="{{ url_for('index') }}">前台</a>
+                <a href="{{ url_for('index') }}">Public site</a>
                 {% if current_visitor %}
-                <span class="chip">当前访客：{{ current_visitor.display_name }}</span>
+                <span class="chip">Current visitor: {{ current_visitor.display_name }}</span>
                 <form action="{{ url_for('visitor_logout') }}" method="post" class="inline-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <button type="submit" class="ghost-button">退出访客</button>
+                    <button type="submit" class="ghost-button">Log out visitor</button>
                 </form>
                 {% else %}
-                <a href="{{ url_for('visitor_login') }}">访客登录</a>
-                <span class="chip">匿名访客</span>
+                <a href="{{ url_for('visitor_login') }}">Visitor login</a>
+                <span class="chip">Anonymous visitor</span>
                 {% endif %}
                 {% if current_blogger %}
-                <a href="{{ url_for('dashboard') }}">仪表盘</a>
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
                 <form action="{{ url_for('logout') }}" method="post" class="inline-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <button type="submit" class="ghost-button">退出</button>
+                    <button type="submit" class="ghost-button">Log out</button>
                 </form>
-                <span class="chip">{{ current_blogger.display_name }} / {{ "高级博主" if current_blogger.role == "premium" else "普通博主" }}</span>
+                <span class="chip">{{ current_blogger.display_name }} / {{ "Premium Blogger" if current_blogger.role == "premium" else "Basic Blogger" }}</span>
                 {% else %}
-                <a href="{{ url_for('login') }}">博主登录</a>
+                <a href="{{ url_for('login') }}">Blogger login</a>
                 {% endif %}
             </nav>
         </header>

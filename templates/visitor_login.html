@@ -1,37 +1,37 @@
 {% extends "base.html" %}
 
-{% block title %}访客登录 | Secure Blog Analytics{% endblock %}
+{% block title %}Visitor Login | Secure Blog Analytics{% endblock %}
 
 {% block content %}
 <section class="login-shell">
     <div class="login-card">
-        <p class="eyebrow">前台访客入口</p>
-        <h1>访客登录</h1>
+        <p class="eyebrow">Public visitor entry</p>
+        <h1>Visitor Login</h1>
         <p class="muted">
             Visitors can browse anonymously or log in as visitor accounts.
-            已登录访客的浏览、点赞、分享、评论和停留时间会绑定到 visitor account。
+            A logged-in visitor's views, likes, shares, comments, and dwell time are linked to the visitor account.
         </p>
         <form method="post" class="login-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <label>
-                用户名
+                Username
                 <input type="text" name="username" placeholder="visitor1" required>
             </label>
             <label>
-                密码
+                Password
                 <input type="password" name="password" placeholder="visit123" required>
             </label>
-            <button class="primary-button" type="submit">登录为访客</button>
+            <button class="primary-button" type="submit">Log in as Visitor</button>
         </form>
     </div>
     <div class="demo-card">
-        <h2>访客演示账号</h2>
+        <h2>Visitor Demo Accounts</h2>
         <div class="demo-row">
             <span>Visitor demo account</span>
             <strong>visitor1 / visit123</strong>
         </div>
         <div class="demo-row">
-            <span>备用访客账号</span>
+            <span>Backup visitor account</span>
             <strong>visitor2 / visit123</strong>
         </div>
         <p class="muted">
