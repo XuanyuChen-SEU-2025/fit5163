@@ -56,7 +56,7 @@ class BlogAnalyticsService:
                 generate_password_hash("blog123"),
                 "Lin Lan",
                 "standard",
-                "专注内容增长与基础运营复盘。",
+                "Focused on content growth and basic operations reviews.",
                 created_at,
             ),
             (
@@ -64,7 +64,7 @@ class BlogAnalyticsService:
                 generate_password_hash("blog123"),
                 "Helen He",
                 "premium",
-                "关注安全、增长与高阶分析实践。",
+                "Focused on security, growth, and advanced analytics practices.",
                 created_at,
             ),
         ]
@@ -174,7 +174,7 @@ class BlogAnalyticsService:
                     dwell_seconds=0,
                     details={
                         "journey_step": f"Read: {post['title']}",
-                        "referrer": "首页推荐",
+                        "referrer": "Homepage recommendation",
                     },
                     occurred_at=to_iso(view_time),
                 )
@@ -219,7 +219,7 @@ class BlogAnalyticsService:
                         dwell_seconds=0,
                         details={
                             "journey_step": "Share",
-                            "channel": rnd.choice(["微信", "微博", "复制链接"]),
+                            "channel": rnd.choice(["WeChat", "Weibo", "Copy link"]),
                         },
                         occurred_at=to_iso(view_time + timedelta(minutes=3)),
                     )
@@ -478,7 +478,7 @@ class BlogAnalyticsService:
             session_token,
             request.headers.get("User-Agent", "Unknown"),
             request.headers.get("Accept-Language", "Unknown"),
-            request.referrer or "直接访问",
+            request.referrer or "Direct visit",
             visitor_account=visitor_account,
         )
         self._upsert_visitor_session(
@@ -540,7 +540,7 @@ class BlogAnalyticsService:
             details=self._with_visitor_details({
                 "journey_step": f"Read: {post['title']}",
                 "post_title": post["title"],
-                "referrer": request.referrer or "直接访问",
+                "referrer": request.referrer or "Direct visit",
             }, visitor),
         )
 
@@ -582,7 +582,7 @@ class BlogAnalyticsService:
     def add_share(self, post_id: int) -> dict:
         post = self.get_post_by_id(post_id)
         visitor = self.ensure_visitor_session()
-        channel = request.headers.get("X-Share-Channel", "复制链接")
+        channel = request.headers.get("X-Share-Channel", "Copy link")
         self._log_activity(
             blogger_id=post["blogger_id"],
             post_id=post_id,

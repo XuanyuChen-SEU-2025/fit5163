@@ -66,7 +66,7 @@ def create_app(test_config: dict | None = None) -> Flask:
         def wrapped_view(*args, **kwargs):
             token = request.headers.get("X-CSRF-Token") or request.form.get("csrf_token")
             if not validate_csrf_token(token):
-                abort(400, "无效的 CSRF token")
+                abort(400, "Invalid CSRF token")
             return view(*args, **kwargs)
 
         return wrapped_view
@@ -112,10 +112,10 @@ def create_app(test_config: dict | None = None) -> Flask:
             password = request.form.get("password", "").strip()
             blogger = service.authenticate(username, password)
             if not blogger:
-                flash("用户名或密码错误，请使用演示账号登录。", "error")
+                flash("Invalid username or password. Please use the demo blogger account.", "error")
             else:
                 session["blogger"] = blogger
-                flash(f"欢迎回来，{blogger['display_name']}。", "success")
+                flash(f"Welcome back, {blogger['display_name']}.", "success")
                 return redirect(url_for("dashboard"))
         return render_template("login.html")
 
@@ -124,16 +124,16 @@ def create_app(test_config: dict | None = None) -> Flask:
         if request.method == "POST":
             token = request.headers.get("X-CSRF-Token") or request.form.get("csrf_token")
             if not validate_csrf_token(token):
-                abort(400, "无效的 CSRF token")
+                abort(400, "Invalid CSRF token")
             username = request.form.get("username", "").strip()
             password = request.form.get("password", "").strip()
             visitor = service.authenticate_visitor(username, password)
             if not visitor:
-                flash("访客用户名或密码错误，请使用演示访客账号登录。", "error")
+                flash("Invalid visitor username or password. Please use the demo visitor account.", "error")
             else:
                 session["visitor"] = visitor
                 session.pop("visitor_token", None)
-                flash(f"已登录访客：{visitor['display_name']}。", "success")
+                flash(f"Signed in as visitor: {visitor['display_name']}.", "success")
                 return redirect(url_for("index"))
         return render_template("visitor_login.html")
 
@@ -142,14 +142,14 @@ def create_app(test_config: dict | None = None) -> Flask:
     def visitor_logout():
         session.pop("visitor", None)
         session.pop("visitor_token", None)
-        flash("已退出访客账号，之后的前台行为会记录为匿名访客。", "success")
+        flash("Signed out of the visitor account. Future public activity will be recorded as anonymous.", "success")
         return redirect(url_for("index"))
 
     @app.post("/logout")
     @csrf_protected
     def logout():
         session.pop("blogger", None)
-        flash("你已安全退出。", "success")
+        flash("You have signed out safely.", "success")
         return redirect(url_for("index"))
 
     @app.get("/post/<slug>")
@@ -183,10 +183,10 @@ def create_app(test_config: dict | None = None) -> Flask:
     @app.post("/api/posts/<int:post_id>/comment")
     @csrf_protected
     def comment_post(post_id: int):
-        author_alias = request.form.get("author_alias", "匿名访客").strip() or "匿名访客"
+        author_alias = request.form.get("author_alias", "Anonymous visitor").strip() or "Anonymous visitor"
         content = request.form.get("content", "").strip()
         if len(content) < 4:
-            return jsonify({"ok": False, "error": "评论至少需要 4 个字符。"}), 400
+            return jsonify({"ok": False, "error": "Comments must be at least 4 characters."}), 400
         metrics = service.add_comment(post_id, author_alias[:20], content[:240])
         return jsonify({"ok": True, "metrics": metrics})
 
@@ -196,7 +196,7 @@ def create_app(test_config: dict | None = None) -> Flask:
         post_id = int(request.form.get("post_id", 0))
         seconds = max(0, min(int(request.form.get("seconds", 0)), 3600))
         if not post_id:
-            return jsonify({"ok": False, "error": "缺少文章编号。"}), 400
+            return jsonify({"ok": False, "error": "Missing post ID."}), 400
         metrics = service.record_dwell_time(post_id, seconds)
         return jsonify({"ok": True, "metrics": metrics})
 

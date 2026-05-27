@@ -228,8 +228,6 @@ def test_public_pages_do_not_expose_dashboard_only_analytics():
 def test_basic_and_premium_dashboards_render_visitor_type_pie():
     app = build_app()
     client = app.test_client()
-    legacy_anonymous_distribution = "匿名访客" + "分布"
-    legacy_anonymous_stats = "匿名访客" + "统计"
 
     basic_response = client.post(
         "/login",
@@ -239,8 +237,6 @@ def test_basic_and_premium_dashboards_render_visitor_type_pie():
     basic_html = basic_response.get_data(as_text=True)
     assert basic_response.status_code == 200
     assert "Visitor Personas" in basic_html
-    assert legacy_anonymous_distribution not in basic_html
-    assert legacy_anonymous_stats not in basic_html
     assert "Visitor Type Share" in basic_html
     assert "Anonymous visitor" in basic_html
     assert "Logged-in visitor" in basic_html
@@ -257,8 +253,6 @@ def test_basic_and_premium_dashboards_render_visitor_type_pie():
     premium_html = premium_response.get_data(as_text=True)
     assert premium_response.status_code == 200
     assert "Visitor Personas" in premium_html
-    assert legacy_anonymous_distribution not in premium_html
-    assert legacy_anonymous_stats not in premium_html
     assert "Visitor Type Share" in premium_html
     assert "Anonymous visitor" in premium_html
     assert "Logged-in visitor" in premium_html
